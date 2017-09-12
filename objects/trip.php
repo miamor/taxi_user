@@ -13,7 +13,7 @@ class Trip extends Config {
 			$query = "INSERT INTO
 					" . $this->table_name . "
 				SET
-					name = ?, phone = ?, addressfrom = ?, addressto = ?, PNR = ?, time = ?, seat = ?, coin = ?, price = ?, is_round = ?, details = ?";
+					name = ?, phone = ?, addressfrom = ?, addressto = ?, PNR = ?, time = ?, seat = ?, is_round = ?, details = ?, num_guess = ?";
 
 		$stmt = $this->conn->prepare($query);
 
@@ -25,9 +25,8 @@ class Trip extends Config {
         $this->PNR = htmlspecialchars(strip_tags($this->PNR));
         $this->time = htmlspecialchars(strip_tags($this->time));
         $this->seat = htmlspecialchars(strip_tags($this->seat));
-        $this->coin = htmlspecialchars(strip_tags($this->coin));
-        $this->price = htmlspecialchars(strip_tags($this->price));
         $this->is_round = htmlspecialchars(strip_tags($this->is_round));
+        $this->num_guess = htmlspecialchars(strip_tags($this->num_guess));
 		$this->details = content($this->details);
 
         // bind parameters
@@ -38,10 +37,9 @@ class Trip extends Config {
         $stmt->bindParam(5, $this->PNR);
         $stmt->bindParam(6, $this->time);
         $stmt->bindParam(7, $this->seat);
-        $stmt->bindParam(8, $this->coin);
-        $stmt->bindParam(9, $this->price);
-        $stmt->bindParam(10, $this->is_round);
-        $stmt->bindParam(11, $this->details);
+        $stmt->bindParam(8, $this->is_round);
+        $stmt->bindParam(9, $this->details);
+        $stmt->bindParam(10, $this->num_guess);
 
         // execute the query
 		if ($stmt->execute()) {

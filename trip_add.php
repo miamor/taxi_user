@@ -1,6 +1,6 @@
 <?php
-include '../../include/config.php';
-include '../../objects/trip.php';
+include 'config.php';
+include 'objects/trip.php';
 
 $trip = new Trip();
 
@@ -15,11 +15,14 @@ $trip->seat = isset($_POST['seat']) ? $_POST['seat'] : null;
 //$trip->price = isset($_POST['price']) ? $_POST['price'] : null;
 $trip->is_round = isset($_POST['is_round']) ? $_POST['is_round'] : 0;
 $trip->details = isset($_POST['details']) ? content($_POST['details']) : 0;
-$trip->num_guess = isset($_POST['num_guess']) ? $_POST['num_guess'] : 0;
+$trip->num_guess = isset($_POST['guess_num']) ? $_POST['guess_num'] : 0;
 //$trip->prioritize = isset($_POST['prioritize']) ? $_POST['prioritize'] : null;
 
+//echo json_encode($_POST, JSON_UNESCAPED_UNICODE);
 if ($trip->name && $trip->phone && $trip->from && $trip->to && $trip->time && $trip->seat && $trip->num_guess) {
 	$add = $trip->create();
 	echo ($add ? 1 : 0);
 	//echo json_encode($data, JSON_UNESCAPED_UNICODE);
-} else echo -1;
+} else {
+    echo -1;
+}

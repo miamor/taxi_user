@@ -2,33 +2,14 @@
 session_start();
 error_reporting(E_ERROR | E_PARSE);
 
-$__pattern = '/taxi_taxi';
+$__pattern = '/taxi_user';
 
 define('MAIN_PATH', './');
-define('MAIN_PATH_EXEC', '/opt/lampp/htdocs'.$__pattern.'/');
-/*define('HOST_URL', '//localhost'.$__pattern);
-define('MAIN_URL', 'http:'.HOST_URL);
-define('HOST_URL', '//192.168.8.100'.$__pattern);
-*/
-define('REQUEST_URL', 'http://localhost:5000');
+
 define('HOST_URL', '//localhost'.$__pattern);
 define('MAIN_URL', 'http:'.HOST_URL);
-define('ASSETS', MAIN_URL.'/assets');
-define('CSS', ASSETS.'/dist/css');
-define('JS', ASSETS.'/dist/js');
-define('IMG', ASSETS.'/dist/img');
-define('PLUGINS', ASSETS.'/plugins');
-//define('GG_API_KEY', 'AIzaSyA5xbqBF1tGx96z6-QLhGGmvqIQ5LUrt4s');
-define('GG_API_KEY', 'AIzaSyACkc-PYhlnPUWJaV2GlcCiEcuJujZsMdc');
-define('GG_CX_ID', '014962602028620469778:yf4br-mf6mk');
-/*define('EXEC_PATH_C_CPP', 'I:\Dev-Cpp\MinGW64\bin/');
-define('EXEC_PATH_JAVA', 'I:\Java\jdk1.8.0_91\bin/');
-define('EXEC_PATH_PYTHON', 'I:\Python2.7.12/');
-*/define('GOODREADS_KEY', 'Nw65U07B93O4X8l3SUTw');
 
 $__page = str_replace($__pattern.'/', '', $_SERVER['REQUEST_URI']);
-define('__HOST', 'ubuntu');
-//define('__HOST', 'window');
 
 
 // Start config
