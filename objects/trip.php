@@ -90,103 +90,67 @@ class Trip extends Config {
 	}
 
 
-    public function readAll_myPriority () {
+    public function readAll () {
         $now = date('Y-m-d');
-        $query = "SELECT
-					*
-				FROM
-					" . $this->table_name . "
-				WHERE
-                    status = 0 AND prioritize = ?
-                ORDER BY
-                    status ASC, time ASC, id ASC";
+        //$todayNotTakenList = $this->readAll_today_not_taken();
 
-		$stmt = $this->conn->prepare($query);
-        $stmt->bindParam(1, $this->taxiID);
-		$stmt->execute();
-
-		$all_list = array();
-
-		while ($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
-            $row['is_round_txt'] = ($row['is_round'] ? '2 chiều' : null);
-            $row['is_one_round'] = ($row['is_round'] ? 0 : 1);
-            $fromAr = array_values(array_filter(explode(',', $row['addressfrom'])));
-            $toAr = array_values(array_filter(explode(',', $row['addressto'])));
-            $row['addressfrom'] = trim(implode(',', array_slice($fromAr, -2, 2, true)));
-            $row['addressto'] = trim(implode(',', array_slice($toAr, -2, 2, true)));
-            $all_list[] = $row;
-        }
-        return $all_list;
-    }
-
-    public function readAll_today () {
-        $now = date('Y-m-d');
-
-            $query = "SELECT
-					*
-				FROM
-					" . $this->table_name . "
-				WHERE
-                    status = 0
-                    AND time LIKE '{$now}%' AND
-                    (prioritize != {$this->taxiID} OR prioritize IS NULL)
-                ORDER BY
-                    status ASC, time ASC, id ASC";
-
-		$stmt = $this->conn->prepare($query);
-		$stmt->execute();
-
-		$all_list = array();
-
-		while ($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
-            $row['is_round_txt'] = ($row['is_round'] ? '2 chiều' : null);
-            $row['is_one_round'] = ($row['is_round'] ? 0 : 1);
-            $fromAr = array_values(array_filter(explode(',', $row['addressfrom'])));
-            $toAr = array_values(array_filter(explode(',', $row['addressto'])));
-            $row['addressfrom'] = trim(implode(',', array_slice($fromAr, -2, 2, true)));
-            $row['addressto'] = trim(implode(',', array_slice($toAr, -2, 2, true)));
-            $all_list[] = $row;
-        }
-        return $all_list;
-    }
-
-    public function readAll ($withPri = 1) {
-        $now = date('Y-m-d');
-        $todayList = $this->readAll_today();
-
-        $myPriority = $this->readAll_myPriority();
         $query = "SELECT
     					*
     				FROM
     					" . $this->table_name . "
     				WHERE
                         status = 0
-                        AND time NOT LIKE '{$now}%' AND
-                        (prioritize != {$this->taxiID} OR prioritize IS NULL)
+                        AND time > '{$now}'
+                        AND phone = ?
                     ORDER BY
-                        status ASC, time ASC, id ASC";
+                        CASE WHEN approve = 1 then 1 else 2 end,
+                        CASE WHEN time LIKE '{$now}%' then 1 else 2 end,
+                        time ASC, id ASC";
 
 		$stmt = $this->conn->prepare($query);
+        $stmt->bindParam(1, $this->user_phone);
 		$stmt->execute();
 
 		$all_list = array();
+        $approve = array();
 
 		while ($row = $stmt->fetch(PDO::FETCH_ASSOC)) {
             $row['is_round_txt'] = ($row['is_round'] ? '2 chiều' : null);
             $row['is_one_round'] = ($row['is_round'] ? 0 : 1);
-            $fromAr = array_values(array_filter(explode(',', $row['addressfrom'])));
-            $toAr = array_values(array_filter(explode(',', $row['addressto'])));
-            $row['addressfrom'] = trim(implode(',', array_slice($fromAr, -2, 2, true)));
-            $row['addressto'] = trim(implode(',', array_slice($toAr, -2, 2, true)));
+            $row['class'] = '';
+            if ($row['approve']) {
+                $row['class'] .= ' approved';
+            }
+            if (strpos($row['time'], $now)) {
+                $row['class'] .= ' today';
+            }
             $all_list[] = $row;
         }
 //        echo json_encode($all_list);
 
-        if ($withPri) $this->all_list = array('myPriority'=>$myPriority, 'today'=>$todayList,
-         'others'=>$all_list);
-        else $this->all_list = array('today'=>$todayList,
-         'others'=>$all_list);
+        $this->all_list = array('data'=>$all_list, 'trips_num'=>count($all_list));
         return $this->all_list;
+    }
+
+    public function countAll () {
+        $now = date('Y-m-d');
+        $today = $this->count_today();
+        $myPriority = $this->count_priority();
+
+        $query = "SELECT
+					id,status,`time`,prioritize
+				FROM
+					" . $this->table_name . "
+                WHERE
+                    status = 0
+                    AND time > '{$now}'
+                    AND phone = ?";
+
+		$stmt = $this->conn->prepare($query);
+        $stmt->bindParam(1, $this->user_phone);
+		$stmt->execute();
+        $all = $stmt->rowCount()+$today+$myPriority;
+        return $all;
     }
 
     public function readOne () {
@@ -202,12 +166,6 @@ class Trip extends Config {
 		$row = $stmt->fetch(PDO::FETCH_ASSOC);
 
         if ($row['id']) {
-            $row['addressfrom_full'] = $row['addressfrom'];
-            $row['addressto_full'] = $row['addressto'];
-            $fromAr = array_values(array_filter(explode(',', $row['addressfrom'])));
-            $toAr = array_values(array_filter(explode(',', $row['addressto'])));
-            $row['addressfrom'] = trim(implode(',', array_slice($fromAr, -2, 2, true)));
-            $row['addressto'] = trim(implode(',', array_slice($toAr, -2, 2, true)));
             $row['is_round_txt'] = ($row['is_round'] ? '2 chiều' : '1 chiều');
             $row['is_one_round'] = ($row['is_round'] ? "0" : "1");
         }
