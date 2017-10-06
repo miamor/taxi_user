@@ -18,6 +18,14 @@ $trip->details = isset($_POST['details']) ? content($_POST['details']) : 0;
 $trip->num_guess = isset($_POST['guess_num']) ? $_POST['guess_num'] : 0;
 //$trip->prioritize = isset($_POST['prioritize']) ? $_POST['prioritize'] : null;
 
+$frAr = explode(',', $trip->from);
+$toAr = explode(',', $trip->to);
+$frAr = $frAr[count($frAr)-2]; // from district
+$frAr = $toAr[count($toAr)-2]; // to district
+
+// set price
+$trip->price = 0;
+
 //echo json_encode($_POST, JSON_UNESCAPED_UNICODE);
 if ($trip->name && $trip->phone && $trip->from && $trip->to && $trip->time && $trip->seat && $trip->num_guess) {
 	$add = $trip->create();
