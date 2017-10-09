@@ -23,9 +23,6 @@ $toAr = explode(',', $trip->to);
 $frAr = $frAr[count($frAr)-2]; // from district
 $frAr = $toAr[count($toAr)-2]; // to district
 
-// set price
-$trip->price = 0;
-
 //echo json_encode($_POST, JSON_UNESCAPED_UNICODE);
 if ($trip->name && $trip->phone && $trip->from && $trip->to && $trip->time && $trip->seat && $trip->num_guess && $trip->price) {
 	$add = $trip->create();
