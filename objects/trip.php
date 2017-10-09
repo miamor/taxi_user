@@ -13,7 +13,7 @@ class Trip extends Config {
 			$query = "INSERT INTO
 					" . $this->table_name . "
 				SET
-					name = ?, phone = ?, addressfrom = ?, addressto = ?, PNR = ?, time = ?, seat = ?, is_round = ?, details = ?, num_guess = ?";
+					name = ?, phone = ?, addressfrom = ?, addressto = ?, PNR = ?, time = ?, seat = ?, is_round = ?, details = ?, num_guess = ?, price = ?";
 
 		$stmt = $this->conn->prepare($query);
 
@@ -40,6 +40,7 @@ class Trip extends Config {
         $stmt->bindParam(8, $this->is_round);
         $stmt->bindParam(9, $this->details);
         $stmt->bindParam(10, $this->num_guess);
+        $stmt->bindParam(11, $this->price);
 
         // execute the query
 		if ($stmt->execute()) {
